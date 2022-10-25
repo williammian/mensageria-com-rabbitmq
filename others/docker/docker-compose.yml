@@ -27,7 +27,7 @@ services:
       timeout: 10s
       retries: 120
     volumes:
-       - ./dados/mysql/pagamentos:/var/lib/pagamentos/
+       - ./dados/mysql/pagamentos:/var/lib/mysql/
     environment:
       MYSQL_ROOT_PASSWORD: "root"
       MYSQL_USER: "user"
@@ -48,7 +48,7 @@ services:
       timeout: 10s
       retries: 120
     volumes:
-       - ./dados/mysql/pedidos:/var/lib/pedidos/
+       - ./dados/mysql/pedidos:/var/lib/mysql/
     environment:
       MYSQL_ROOT_PASSWORD: "root"
       MYSQL_USER: "user"
