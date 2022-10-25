@@ -1,15 +1,63 @@
 version: "3.6"
 
 services:
-    rabbitmq:
-        image: rabbitmq:3.10-management
-        container_name: rabbitmq
-        restart: always
-        ports:
-            - 5672:5672
-            - 15672:15672
-        volumes:
-            - ./dados/rabbitmq:/var/lib/rabbitmq/
-        environment:
-            - RABBITMQ_DEFAULT_USER=user
-            - RABBITMQ_DEFAULT_PASS=user
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.10-management
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+       - ./dados/rabbitmq:/var/lib/rabbitmq/
+    environment:
+       - RABBITMQ_DEFAULT_USER=user
+       - RABBITMQ_DEFAULT_PASS=user
+    networks:
+       - ms-network
+            
+  bd-pagamentos:
+    container_name: bd-pagamentos
+    image: mysql:5.7
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: mysql --protocol=socket -hlocalhost -uroot -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1'
+      interval: 20s
+      timeout: 10s
+      retries: 120
+    volumes:
+       - ./dados/mysql/pagamentos:/var/lib/pagamentos/
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "user123"
+      MYSQL_DATABASE: "alurafood-pagamentos"
+      MYSQL_ROOT_HOST: "%"
+    networks:
+       - ms-network
+      
+  bd-pedidos:
+    container_name: bd-pedidos
+    image: mysql:5.7
+    ports:
+      - 3307:3306
+    healthcheck:
+      test: mysql --protocol=socket -hlocalhost -uroot -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1'
+      interval: 20s
+      timeout: 10s
+      retries: 120
+    volumes:
+       - ./dados/mysql/pedidos:/var/lib/pedidos/
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "user123"
+      MYSQL_DATABASE: "alurafood-pedidos"
+      MYSQL_ROOT_HOST: "%"
+    networks:
+       - ms-network
+      
+networks:
+  ms-network:
+    driver: bridge
