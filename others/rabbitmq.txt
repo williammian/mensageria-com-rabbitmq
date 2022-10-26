@@ -1,0 +1,50 @@
+Spring AMQP
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+
+
+------------------------------------
+
+application.properties
+
+//código omitido
+
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=guest
+
+//código omitido
+
+------------------------------------
+
+RabbitTemplate
+
+Para fazer o envio das mensagens para o RabbitMQ, 
+ao realizar uma requisição do tipo POST em nosso endpoint, utilizamos o RabbitTemplate. 
+Mas, afinal, que classe é essa que injetamos no nosso controller?
+
+O RabbitTemplate é uma classe helper que simplifica
+o processo de envio e recebimento de mensagens para o RabbitMQ. 
+Ela tem vários métodos para que se possa personalizar como vai ser a conversão das mensagens, 
+a routing key ou exchange padrão para envio, além de algumas configurações de resposta, 
+quando se deseja a confirmação de consumo da mensagem.
+
+------------------------------------
+
+RabbitListener
+
+Para consumir mensagens de uma fila, a dependência do spring-boot-starter-amqp 
+disponibiliza a anotação @RabbitListener, que recebe como parâmetro 
+um array de Strings correspondentes aos nomes das filas que serão consumidas. 
+Dessa forma, assim que a aplicação é inicializada, o método com essa anotação 
+começará a ser executado e as mensagens da(s) fila(s) serão consumida(s).
+
+O método geralmente recebe como parâmetro um tipo Message. 
+A anotação @Payload indica que o parâmetro do método vai receber o corpo da mensagem. 
+Essa anotação é opcional quando há apenas um parâmetro no método.
+
+------------------------------------
