@@ -1,4 +1,4 @@
-package br.com.alurafood.pedidos.amqp;
+package br.com.alurafood.avaliacao.avaliacao.amqp;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -16,24 +16,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class PedidoAMQPConfiguration {
-	
-	@Bean
-	public Jackson2JsonMessageConverter messageConverter(){
-		return new Jackson2JsonMessageConverter();
-	}
-	
-	@Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, Jackson2JsonMessageConverter messageConverter){
-		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-		rabbitTemplate.setMessageConverter(messageConverter);
-		return  rabbitTemplate;
+public class AvaliacaoAMQPConfiguration {
+    @Bean
+    public Jackson2JsonMessageConverter messageConverter(){
+        return  new Jackson2JsonMessageConverter();
     }
 
-	@Bean
-    public Queue filaDetalhesPedido() {
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory,
+                                         Jackson2JsonMessageConverter messageConverter){
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(messageConverter);
+        return  rabbitTemplate;
+    }
+
+    @Bean
+    public Queue filaDetalhesAvaliacao() {
         return QueueBuilder
-                .nonDurable("pagamentos.detalhes-pedido")
+                .nonDurable("pagamentos.detalhes-avaliacao")
                 .build();
     }
 
@@ -45,11 +45,11 @@ public class PedidoAMQPConfiguration {
     }
 
     @Bean
-	public Binding bindPagamentoPedido(FanoutExchange fanoutExchange) {
-    	return BindingBuilder
-	            .bind(filaDetalhesPedido())
-	            .to(fanoutExchange());
-	}
+    public Binding bindPagamentoPedido(FanoutExchange fanoutExchange) {
+        return BindingBuilder
+                .bind(filaDetalhesAvaliacao())
+                .to(fanoutExchange());
+    }
 
     @Bean
     public RabbitAdmin criaRabbitAdmin(ConnectionFactory conn) {

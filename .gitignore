@@ -2,6 +2,7 @@
 /gateway/target
 /pagamentos/target
 /pedidos/target
+/avaliacao/target
 /others/docker/dados
 
 HELP.md

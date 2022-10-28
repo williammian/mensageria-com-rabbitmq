@@ -1,0 +1,55 @@
+RabbitMQ Simulator
+
+tryrabbitmq.com
+
+------------------------------
+
+Exchanges
+
+Direct: Esse tipo de exchange é usada, geralmente, quando desejamos enviar 
+mensagens para um consumidor específico. 
+Para isso, utilizamos uma routing key, que é uma chave enviada junto 
+com a mensagem para que a exchange identifique qual a fila irá receber a mensagem.
+
+
+
+Fanout: Quando enviamos uma mensagem para uma exchange desse tipo, ela vai ser enviada 
+para todas as filas que estiverem ligadas a essa exchange. 
+Ou seja, se existirem 30 filas ligadas a essa exchange, essas 30 filas receberão a mensagem. 
+Para conectar uma fila a uma exchange é preciso criar um bind, 
+que é uma relação (ou vínculo) entre uma fila e uma exchange. 
+Nomeia-se como binding key essa chave de ligação entre a fila e a exchange.
+
+
+
+Headers: É um tipo muito menos usado, mas basicamente ignora o routing key e passa 
+no próprio cabeçalho da mensagem para qual binding key deve ser encaminhada a mensagem.
+
+
+
+Topic: A palavra-chave desse tipo de exchange é flexibilidade. 
+Você pode nomear as binding keys de uma forma a criar padrões e/ou regras para que o envio seja de forma personalizada. 
+Essas binding keys são descritas como se fossem expressões regulares. 
+Dessa forma, podemos fazer composições para que mais de um consumidor receba as mensagens.
+
+Suponha que eu tenha uma aplicação produtora, chamada pedido. 
+E em um determinado momento seja necessário mandar mensagem para apenas dois consumidores: 
+o estoque, para confirmar se tem os itens do pedido, 
+e para o financeiro, para ver se o cliente desse pedido tem alguma pendência.
+
+Num segundo momento, eu vou querer enviar uma mensagem para esses dois consumidores e mais um terceiro, que é o pagamento. 
+Para isso, configurei as minhas binding keys da seguinte forma:
+
+As binding keys da fila-estoque e da fila-financeiro com a exchange, configurei como pedido.*
+
+Já a binding key da fila-pagamento com a exchange, configurei como *.pagamento
+
+Caso o pedido envie uma mensagem com a routing key pedido.criado, por exemplo, 
+tanto o estoque quanto o financeiro receberão a mensagem, 
+pois a routing key se enquadra no padrão que foi definido na binding key.
+
+Caso o pedido envie uma mensagem com a routing key pedido.pagamento, 
+os três consumidores receberão a mensagem, pois o roteamento atende aos dois padrões.
+
+Dessa forma, é possível compor e estabelecer padrões para definir envios com rotas diferenciadas, 
+baseado em alguma situação específica que somente uns ou outros consumidores precisem receber as mensagens.
