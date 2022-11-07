@@ -1,0 +1,50 @@
+Replicando mensagens no cluster
+
+Add / update a policy:
+
+Name: ha
+Pattern: .*
+Apply to: Exchanges and queues
+Priority: vazio
+Definition: ha mode = all
+
+-------------------------------------
+
+Mirrored Queues, que são filas espelhadas. Essas filas funcionam da seguinte forma: 
+elas possuem uma fila primária em um dos nós do cluster, e o espelhamento ocorre em um ou mais membros desse cluster. 
+As mensagens publicadas na fila primeiro acessam o nó primário (onde a fila foi originalmente criada) e, 
+em seguida, são replicadas para os espelhos. Se algo acontecer com o nó primário, 
+o espelho sincronizado mais antigo será promovido a primário. 
+Existe uma projeção de desativar esse recurso a partir da versão 4.0 do RabbitMQ, 
+que ainda não há previsão de liberação, para que sejam priorizadas as quorum queues. 
+Isso porque o algoritmo que faz esse espelhamento é considerado ineficiente 
+e pode sofrer alguns problemas de sincronização e performance.
+
+-------------------------------------
+
+Um dos grandes problemas citados é que quando uma das instâncias fica offline e depois retorna, 
+os dados que estavam espalhados são perdidos. E aí é necessário decidir se vai novamente sincronizar 
+e pegar as filas e mensagens do nó primário ou não. 
+Quando se opta por sincronizar novamente as filas e mensagens, nesse período de sincronização a fila primária fica indisponível, 
+pois a sincronização é bloqueante. Quando o fluxo está ocorrendo bem, 
+publicação e consumo acontecendo de forma rápida, essa sincronização não gera um impacto perceptível. 
+Mas quando há acúmulo de muitas mensagens na fila, pode ser um problema.
+
+Para tratar essas questões, a partir da versão 3.8 do RabbitMQ foram lançadas as quorum queues, 
+ou filas de quorum, usando o algoritmo de consenso Raft, 
+para promover uma melhor performance em relação às filas espelhadas e garantir a segurança das mensagens. 
+Nessa abordagem, determina-se que deve haver um quorum mínimo de réplicas disponíveis. 
+No caso do nosso exemplo, temos três nós com os dados. 
+Se dois ficassem indisponíveis, a fila também já ficaria indisponível para os clientes, 
+por não ter um quorum mínimo para replicação e segurança das mensagens. 
+Quando um produtor publica uma mensagem, a fila só confirma o recebimento uma vez que 
+a maioria das réplicas confirmam o recebimento e armazenamento do dado em disco.
+
+-------------------------------------
+
+https://www.rabbitmq.com/quorum-queues.html
+
+
+
+
+
